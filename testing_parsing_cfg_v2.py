@@ -14,7 +14,7 @@ def parse_tokenized_sentence(parser, sentence_list):
     
     generator_content = []
     
-    generator_content_num = 0
+    generator_content_num = 1
     for content in generator:
         if generator_content_num > 20:
             break
