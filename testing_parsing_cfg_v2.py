@@ -10,7 +10,7 @@ def initialize_chart_parser(grammar):
     return ChartParser(grammar)
 
 def parse_tokenized_sentence(parser, sentence_list):
-    generator = parser.parse_one(sentence_list)
+    generator = parser.parse(sentence_list)
     
     generator_content = []
     
@@ -27,12 +27,8 @@ def parse_tokenized_sentence(parser, sentence_list):
     elif len(generator_content) > 0:
         print('Sintaksis kalimat ini BENAR.')
 
-    if len(generator_content) > 20:
-        for i in range(20):
-            print(generator_content[i])
-    else:
-        for i in generator_content:
-            print(i)
+    for i in generator_content:
+        print(i)
 
 utapis_cp = initialize_chart_parser(utapis_grammar)
 
