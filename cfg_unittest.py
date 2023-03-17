@@ -1,18 +1,46 @@
 import nltk
-from nltk import ChartParser
+from nltk.parse.chart import SteppingChartParser
+from nltk.parse.chart import FilteredBottomUpPredictCombineRule
+from nltk.parse.chart import LeafInitRule, FilteredSingleEdgeFundamentalRule
 import unittest
 import os
 
-base_path = os.path.join(__file__, os.pardir)
+model_path = os.path.join(__file__, os.pardir)
 
-utapis_grammar = nltk.data.load(
-    "file:" + os.path.join(base_path, "utapis_sintaksis_kalimat_v2.cfg"), "cfg"
+grammar = nltk.data.load(
+    "file:" + os.path.join(model_path, "utapis_sintaksis_kalimat_v2_skripsi.cfg"), "cfg"
 )
-utapis_cp = ChartParser(utapis_grammar)
+
+LEFT_CORNER_STRATEGY = [
+    LeafInitRule(),
+    FilteredBottomUpPredictCombineRule(),
+    FilteredSingleEdgeFundamentalRule(),
+]
+
+utapis_scp = SteppingChartParser(
+    grammar=grammar, strategy=LEFT_CORNER_STRATEGY, trace=0
+)
 
 
-def cfg_true_or_false(cp, tags):
-    generator = cp.parse(tags)
+def stepping_chart_parsing(scp, tags):
+    scp.initialize(tags)
+
+    for step in scp.step():
+        # Berhenti bila ditemukan parsing yang lengkap.
+        if len(list(scp.parses())) > 0:
+            break
+
+        # Berhenti bila sudah tidak ada lagi kemungkinan parsing
+        # yang bisa ditambahkan.
+        if step is None:
+            break
+
+    # Return generator.
+    return scp.parses()
+
+
+def cfg_true_or_false(scp, tags):
+    generator = stepping_chart_parsing(scp, tags)
     generator_content_count = len(list(generator))
     if generator_content_count <= 0:
         return False
@@ -26,14 +54,14 @@ class TestCFG(unittest.TestCase):
         (Tersangka, nomina), (bungkam, verba), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<verba>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_2(self):
         """
         (Ia, nomina), (bingung, adjektiva), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<adjektiva>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_3(self):
         """
@@ -41,14 +69,14 @@ class TestCFG(unittest.TestCase):
         (Presiden, nomina), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<nomina>", "<nomina>", "<nomina>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_4(self):
         """
         (Presiden, nomina), (memberikan, verba), (grasi, nomina), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<verba>", "<nomina>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_5(self):
         """
@@ -63,7 +91,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_6(self):
         """
@@ -80,7 +108,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_7(self):
         """
@@ -100,7 +128,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_8(self):
         """
@@ -119,7 +147,7 @@ class TestCFG(unittest.TestCase):
             "<numeralia>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_9(self):
         """
@@ -137,7 +165,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_10(self):
         """
@@ -156,7 +184,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_11(self):
         """
@@ -173,7 +201,7 @@ class TestCFG(unittest.TestCase):
             "<numeralia>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_12(self):
         """
@@ -189,7 +217,7 @@ class TestCFG(unittest.TestCase):
             "<adjektiva>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_13(self):
         """
@@ -197,7 +225,7 @@ class TestCFG(unittest.TestCase):
         (baik, adjektiva), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<adverbia>", "<adverbia>", "<adjektiva>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_14(self):
         """
@@ -212,7 +240,7 @@ class TestCFG(unittest.TestCase):
             "<adverbia>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_15(self):
         """
@@ -229,7 +257,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_16(self):
         """
@@ -250,7 +278,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_17(self):
         """
@@ -272,7 +300,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_18(self):
         """
@@ -294,7 +322,7 @@ class TestCFG(unittest.TestCase):
             "<adverbia>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_19(self):
         """
@@ -311,7 +339,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_20(self):
         """
@@ -331,7 +359,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_21(self):
         """
@@ -351,7 +379,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_22(self):
         """
@@ -375,7 +403,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_23(self):
         """
@@ -406,7 +434,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_24(self):
         """
@@ -430,7 +458,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_25(self):
         """
@@ -452,7 +480,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_26(self):
         """
@@ -468,7 +496,7 @@ class TestCFG(unittest.TestCase):
             "<td_akhir_kal>",
             "<kutip_akhir>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_27(self):
         """
@@ -484,7 +512,7 @@ class TestCFG(unittest.TestCase):
             "<td_akhir_kal>",
             "<kutip_akhir>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_benar_28(self):
         """
@@ -503,14 +531,14 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_salah_1(self):
         """
         (Tersangka, nomina), (bungkam, verba)
         """
         kal = ["<nomina>", "<verba>"]
-        self.assertFalse(cfg_true_or_false(utapis_cp, kal))
+        self.assertFalse(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_salah_2(self):
         """
@@ -532,7 +560,7 @@ class TestCFG(unittest.TestCase):
             "<verba>",
             "<td_akhir_kal>",
         ]
-        self.assertFalse(cfg_true_or_false(utapis_cp, kal))
+        self.assertFalse(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_spesial_1(self):
         """
@@ -556,7 +584,7 @@ class TestCFG(unittest.TestCase):
             "<kurung_tutup>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_spesial_2(self):
         """
@@ -577,7 +605,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_tribun_1(self):
         """
@@ -622,7 +650,7 @@ class TestCFG(unittest.TestCase):
             "<numeralia>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_tribun_2(self):
         """
@@ -660,7 +688,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_tribun_3(self):
         """
@@ -692,7 +720,7 @@ class TestCFG(unittest.TestCase):
             "<kurung_tutup>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_tribun_4(self):
         """
@@ -727,7 +755,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
     def test_kal_tribun_5(self):
         """
@@ -746,7 +774,7 @@ class TestCFG(unittest.TestCase):
             "<nomina>",
             "<td_akhir_kal>",
         ]
-        self.assertTrue(cfg_true_or_false(utapis_cp, kal))
+        self.assertTrue(cfg_true_or_false(utapis_scp, kal))
 
 
 if __name__ == "__main__":
