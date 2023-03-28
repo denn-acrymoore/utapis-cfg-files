@@ -171,7 +171,7 @@ class TestCFG(unittest.TestCase):
         """
         (Dua, numeralia), (per, artikel), (lima, numeralia),
         (dari, preposisi), (hasil, nomina), (voting, nomina),
-        (tidak, adverbia), (sah, verba), (., td_akhir_kal)
+        (tidak, tidak), (sah, verba), (., td_akhir_kal)
         """
         kal = [
             "<numeralia>",
@@ -180,7 +180,7 @@ class TestCFG(unittest.TestCase):
             "<preposisi>",
             "<nomina>",
             "<nomina>",
-            "<adverbia>",
+            "<tidak>",
             "<verba>",
             "<td_akhir_kal>",
         ]
@@ -426,7 +426,7 @@ class TestCFG(unittest.TestCase):
             "<konj_sub_tnp_koma_kt_pertama>",
             "<nomina>",
             "<konj_sub_yang>",
-            "<adverbia>",
+            "<tidak>",
             "<adverbia>",
             "<verba>",
             "<verba>",
@@ -577,7 +577,7 @@ class TestCFG(unittest.TestCase):
             "<kurung_buka>",
             "<nomina>",
             "<konj_sub_yang>",
-            "<adverbia>",
+            "<tidak>",
             "<adverbia>",
             "<verba>",
             "<nomina>",
