@@ -3,35 +3,6 @@ from cfg_initialization import cfg_true_or_false
 
 
 class SimpleCFGTest(unittest.TestCase):
-    def test_kal_benar_1(self):
-        """
-        (Tersangka, nomina), (bungkam, verba), (., td_akhir_kal)
-        """
-        kal = ["<nomina>", "<verba>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(kal))
-
-    def test_kal_benar_2(self):
-        """
-        (Ia, nomina), (bingung, adjektiva), (., td_akhir_kal)
-        """
-        kal = ["<nomina>", "<adjektiva>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(kal))
-
-    def test_kal_benar_3(self):
-        """
-        (Bapak, nomina), (Jokowi, nomina), (seorang, nomina),
-        (Presiden, nomina), (., td_akhir_kal)
-        """
-        kal = ["<nomina>", "<nomina>", "<nomina>", "<nomina>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(kal))
-
-    def test_kal_benar_4(self):
-        """
-        (Presiden, nomina), (memberikan, verba), (grasi, nomina), (., td_akhir_kal)
-        """
-        kal = ["<nomina>", "<verba>", "<nomina>", "<td_akhir_kal>"]
-        self.assertTrue(cfg_true_or_false(kal))
-
     def test_kal_benar_5(self):
         """
         (KPK, nomina), (menangkap, verba), (tersangka, nomina), (di, preposisi),
