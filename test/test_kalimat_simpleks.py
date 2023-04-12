@@ -38,7 +38,7 @@ class KalimatSimpleksTest(unittest.TestCase):
 
     def test_subjek_predikat_04(self):
         """
-        -> S-P (nomina-preposisi)
+        -> S-P (nomina-frasaPreposisi)
         (Ia, nomina), (di, preposisi), (pasar, nomina), (., td_akhir_kal)
         """
         kal = ["<nomina>", "<preposisi>", "<nomina>", "<td_akhir_kal>"]
@@ -89,6 +89,46 @@ class KalimatSimpleksTest(unittest.TestCase):
             "<adjektiva>",
             "<nomina>",
             "<verba>",
+            "<td_akhir_kal>",
+        ]
+        self.assertTrue(cfg_true_or_false(kal))
+
+    def test_subjek_predikat_objek_04(self):
+        """
+        -> S-P-O (nomina-frasaPreposisional-frasaNominal)
+        (Ia, nomina), (sedang, adverbia), (ke, preposisi),
+        (taman, nomina), (kota, nomina), (lagi, adverbia),
+        (hari, nomina), (ini, nomina), (., td_akhir_kal)
+        """
+        kal = [
+            "<nomina>",
+            "<adverbia>",
+            "<preposisi>",
+            "<nomina>",
+            "<nomina>",
+            "<adverbia>",
+            "<nomina>",
+            "<nomina>",
+            "<td_akhir_kal>",
+        ]
+        self.assertTrue(cfg_true_or_false(kal))
+
+    def test_subjek_predikat_objek_05(self):
+        """
+        -> S-P-O (frasaNominal-frasaNumeralia-frasaNominal)
+        (Anak, nomina), (Pak, nomina), (Amin, nomina),
+        (sepuluh, numeralia), (ekor, nomina),
+        (saat, nomina), (ini, nomina),
+        (., td_akhir_kal)
+        """
+        kal = [
+            "<nomina>",
+            "<nomina>",
+            "<nomina>",
+            "<numeralia>",
+            "<nomina>",
+            "<nomina>",
+            "<nomina>",
             "<td_akhir_kal>",
         ]
         self.assertTrue(cfg_true_or_false(kal))
